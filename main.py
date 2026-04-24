@@ -1,6 +1,7 @@
 
 import os
 import cv2
+import time
 import numpy as np
 
 FONT = cv2.FONT_HERSHEY_PLAIN
@@ -39,9 +40,12 @@ for file in os.listdir("templates"):
     templates.append((name, extract_feature(contour, area)))
 
 video = cv2.VideoCapture("video.mp4")
+average = 0
+total = 0
 while True:
     retval, image = video.read()
     if not retval: break
+    start_time = time.perf_counter()
     for contour in extract_contours(image):
         area = cv2.contourArea(contour)
         if area < 300: continue
@@ -55,7 +59,15 @@ while True:
         point_b = (x + w + 6, y + h + 6)
         image = cv2.rectangle(image, point_a, point_b, BLUE, 3)
         image = cv2.putText(image, name, point_a, FONT, 1.5, CYAN, 2, 1)
+    end_time = time.perf_counter()
+    fps = 1 / (end_time - start_time)
+    image = cv2.putText(image, f"{fps:.2f} fps", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+    new_total = total + 1
+    average = average * (total / new_total) + fps / new_total
+    total = new_total
     cv2.imshow("Video", image)
     cv2.waitKey(20)
 cv2.waitKey()
 video.release()
+
+print(f"Average fps: {average:.2f} fps")
