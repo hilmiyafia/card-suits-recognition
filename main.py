@@ -60,14 +60,14 @@ while True:
         image = cv2.rectangle(image, point_a, point_b, BLUE, 3)
         image = cv2.putText(image, name, point_a, FONT, 1.5, CYAN, 2, 1)
     end_time = time.perf_counter()
-    fps = 1 / (end_time - start_time)
-    image = cv2.putText(image, f"{fps:.2f} fps", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+    elapsed = (end_time - start_time) * 1000000
+    image = cv2.putText(image, f"{int(average)} us", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
     new_total = total + 1
-    average = average * (total / new_total) + fps / new_total
+    average = average * (total / new_total) + elapsed / new_total
     total = new_total
     cv2.imshow("Video", image)
     cv2.waitKey(20)
 cv2.waitKey()
 video.release()
 
-print(f"Average fps: {average:.2f} fps")
+print(f"Average speed: {int(average)} us")
